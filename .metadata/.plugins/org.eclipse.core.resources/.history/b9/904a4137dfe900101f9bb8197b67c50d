@@ -1,0 +1,5 @@
+package com.hungerbox.identity.exception;
+
+public class GlobalExceptionHandler {
+
+}

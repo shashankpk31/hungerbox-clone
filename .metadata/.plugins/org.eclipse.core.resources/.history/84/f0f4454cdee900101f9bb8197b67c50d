@@ -1,0 +1,5 @@
+package com.hungerbox.identity.dto.response;
+
+public class ApiResponse {
+
+}

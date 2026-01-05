@@ -1,0 +1,5 @@
+package com.hungerbox.identity.config;
+
+public class JpaConfig {
+
+}
