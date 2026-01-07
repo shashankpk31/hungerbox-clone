@@ -1,5 +1,0 @@
-package com.hungerbox.identity.aspect;
-
-public class LoggingAspect {
-
-}

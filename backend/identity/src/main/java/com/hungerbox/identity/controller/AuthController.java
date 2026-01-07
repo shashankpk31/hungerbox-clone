@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hungerbox.identity.constant.ErrorMessageWarnConstant.Message;
 import com.hungerbox.identity.dto.request.AuthRequest;
+import com.hungerbox.identity.dto.request.RegisterRequest;
 import com.hungerbox.identity.dto.response.ApiResponse;
 import com.hungerbox.identity.dto.response.EmptyJson;
-import com.hungerbox.identity.entity.User;
 import com.hungerbox.identity.service.AuthService;
 
 @RestController
@@ -29,10 +30,15 @@ public class AuthController {
 	public AuthController(AuthService authService) {
 		this.authService = authService;
 	}
+	
+	@GetMapping("/home")
+	public ResponseEntity<ApiResponse> home() {
+		return ResponseEntity.ok(new ApiResponse(true, Message.VALID_TOKEN.getMessage(), new EmptyJson()));
+	}
 
 	@PostMapping("/register")
-	public ResponseEntity<ApiResponse> register(@RequestBody User user) {
-		logger.info("REST request to register user: {}", user.getUsername());
+	public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequest user) {
+		logger.info("REST request to register user: {}", user.username());
 		String msg = authService.register(user);
 		return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse(true, msg, new EmptyJson()));
 	}
@@ -41,12 +47,13 @@ public class AuthController {
 	public ResponseEntity<ApiResponse> login(@RequestBody AuthRequest authRequest) {
 		logger.info("REST request to login user: {}", authRequest.username());
 		String token = authService.login(authRequest.username(), authRequest.password());
-		return ResponseEntity.ok(new ApiResponse(true, "Login Successful", Map.of("token", token)));
+		return ResponseEntity
+				.ok(new ApiResponse(true, Message.AUTH_LOGIN_SUCCESS.getMessage(), Map.of("token", token)));
 	}
 
 	@GetMapping("/validate")
 	public ResponseEntity<ApiResponse> validateToken(@RequestParam("token") String token) {
 		authService.validateToken(token);
-		return ResponseEntity.ok(new ApiResponse(true, "Token is valid", new EmptyJson()));
+		return ResponseEntity.ok(new ApiResponse(true, Message.VALID_TOKEN.getMessage(), new EmptyJson()));
 	}
 }

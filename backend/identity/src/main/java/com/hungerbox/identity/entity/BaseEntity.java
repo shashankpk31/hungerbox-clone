@@ -9,10 +9,12 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.hungerbox.identity.eventlistener.CustomAuditListener;
+
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class,CustomAuditListener.class})
 public abstract class BaseEntity {
 
 	@CreatedDate

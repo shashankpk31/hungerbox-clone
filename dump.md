@@ -1287,3 +1287,195 @@ User can place an order and see it in "My Orders."
 Vendor can see the order and change its status to "Ready."
 Wallet balance is correctly updated.
 This plan is now ready to be executed service-by-service. Which specific part (e.g., JWT Auth code or the Order Logic) should we tackle first?
+
+
+----------------------------------------------------
+
+
+This is a great architectural question. In a professional microservices environment like your **Hungerbox Clone**, the best practice is a **hybrid approach**.
+
+You should keep the **Business Logic of Identity** (User DB, JWT generation, password hashing) in the **Identity Service**, but perform **Token Validation** at the **API Gateway**.
+
+---
+
+### The Recommended Architecture
+
+Here is how you should split the responsibilities:
+
+| Responsibility | Service | Why? |
+| --- | --- | --- |
+| **Authentication (Login/Register)** | `identity-service` | It owns the User database and password logic. |
+| **Token Generation (JWT)** | `identity-service` | It knows the user roles and claims. |
+| **Global Security Filter** | `api-gateway` | To block invalid requests *before* they even hit your internal network (Order/Vendor services). |
+| **Authorization (Roles)** | Both | Gateway checks if the token is valid; Services check if a user can do a specific action (e.g., "only Admin can delete order"). |
+
+---
+
+### Why the API Gateway should handle Security?
+
+1. **Centralized Entry Point:** You don't want to repeat the `JwtAuthenticationFilter` code in `order-service`, `vendor-service`, etc. If you change your JWT secret, you only update it in the Gateway and Identity service.
+2. **Performance:** If a request has a fake or expired token, the API Gateway rejects it immediately. The `order-service` never has to wake up or spend CPU cycles on a bad request.
+3. **Security:** Internal services (like Order/Vendor) can be kept in a private network, accessible only by the Gateway.
+
+---
+
+### How to implement this in your project
+
+#### 1. In `api-gateway`
+
+You need to add a **Global Filter** (using Spring Cloud Gateway). This filter will:
+
+* Check for the `Authorization` header.
+* Validate the JWT (using the same `secretKey` from your `identity-service`).
+* If valid, route the request. If not, return `401 Unauthorized`.
+
+#### 2. In `identity-service`
+
+Keep the code we just wrote! Its job is to handle the `/auth/login` and `/auth/register` endpoints. It remains the "Source of Truth" for who a user is.
+
+#### 3. In `order-service` and `vendor-service`
+
+These services should trust the Gateway. However, for extra safety, they can still have a simple security config that extracts the user ID from the headers passed by the Gateway.
+
+---
+
+### My Recommendation for your next step:
+
+Since you have already built the security in the `identity-service`, keep it there for now to ensure your login/register logic works.
+
+Once your `identity-service` is fully working, we should move the **Validation Filter** to the `api-gateway`.
+
+**Would you like me to show you the code for the `AuthenticationFilter` specifically for your `api-gateway`?** (This will be different from the one in Identity because the Gateway is usually reactive/WebFlux based).
+
+
+
+To implement the **API Gateway + Identity Service** security pattern, we need to shift the "Token Validation" responsibility to the Gateway while keeping "User Management" in Identity.
+
+Here are the exact changes required across your microservices.
+
+---
+
+### 1. Identity Service Changes
+
+You have already done the heavy lifting here. However, since the Gateway will now act as the "bouncer," we simplify the `Identity Service` to focus on creating tokens.
+
+* **Keep:** `AuthService`, `JwtService`, and `AuthController`.
+* **Keep:** `SecurityConfig` (but only for the `/auth/**` endpoints).
+* **Remove:** You won't need to protect the internal `/user/**` endpoints as strictly here if the Gateway is already doing it, but keeping it as a "secondary" layer is fine.
+
+### 2. API Gateway Changes (Critical)
+
+The `api-gateway` in Spring Cloud is usually **Reactive (WebFlux)**. The `JwtAuthenticationFilter` you wrote for the Identity service won't work there because it uses `HttpServletRequest` (Servlet-based).
+
+**You need to create a `GatewayFilter` in the Gateway:**
+
+**Add these dependencies to `api-gateway/pom.xml`:**
+
+* `spring-cloud-starter-gateway`
+* `io.jsonwebtoken:jjwt-api`, `jjwt-impl`, `jjwt-jackson` (same as Identity)
+
+**Create `AuthenticationFilter.java` in `api-gateway`:**
+This filter will intercept requests to `order-service` or `vendor-service`, check the JWT, and only let them pass if the token is valid.
+
+```java
+// Example logic for Gateway Filter
+public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    ServerHttpRequest request = exchange.getRequest();
+
+    if (validator.isSecured.test(request)) {
+        // 1. Check if header contains token
+        if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+            throw new RuntimeException("Missing authorization header");
+        }
+        
+        String authHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            authHeader = authHeader.substring(7);
+        }
+
+        // 2. Validate token (You can use the same JwtUtils logic here)
+        try {
+            jwtUtils.validateToken(authHeader);
+        } catch (Exception e) {
+            throw new RuntimeException("Unauthorized access");
+        }
+    }
+    return chain.filter(exchange);
+}
+
+```
+
+---
+
+### 3. Order & Vendor Service Changes
+
+These services should no longer care about "Passwords" or "Database Users." They just need to know "Which user is making this request?"
+
+* **The Gateway's Job:** After validating the token, the Gateway should extract the `userId` or `role` from the JWT and add it as a **Request Header** (e.g., `X-User-Id`) before forwarding the request to the Order service.
+* **The Service's Job:** Read the `X-User-Id` header to know who is placing the order.
+
+---
+
+### 4. Configuration Changes (`application.yml`)
+
+You need to map your routes in the Gateway's `application.yml`:
+
+```yaml
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: identity-service
+          uri: lb://IDENTITY-SERVICE
+          predicates:
+            - Path=/auth/**
+
+        - id: order-service
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/orders/**
+          filters:
+            - AuthenticationFilter # Your custom filter
+
+```
+
+---
+
+### Summary of the Flow
+
+1. **Frontend** calls `POST /auth/login`  Gateway sends to **Identity Service**.
+2. **Identity Service** returns a **JWT**.
+3. **Frontend** calls `GET /orders` with the JWT in the header.
+4. **Gateway** intercepts the call  Validates JWT  Extracts User Info  Adds `X-User-Id` to header  Forwards to **Order Service**.
+5. **Order Service** processes the order for that specific `X-User-Id`.
+
+**Which file would you like to work on first? I suggest setting up the `AuthenticationFilter` in the `api-gateway`. Should I provide the full implementation for that?**
+
+
+You are absolutely right. To give you the exact "prescription" for your architecture, I need to see how your services are currently talking to each other and how they are configured.
+
+Please provide the following files:
+
+### 1. From `api-gateway/`
+
+* **`pom.xml`**: I need to see if you are using `spring-cloud-starter-gateway` (Reactive) or an older Zuul/Servlet-based gateway.
+* **`src/main/resources/application.yml`**: This shows me your current routing logic and which paths you've already defined.
+
+### 2. From `identity/`
+
+* **`controller/AuthController.java`**: I want to see the login/register endpoints so I can ensure the Gateway doesn't block them.
+* **`service/CustomUserDetailsService.java`**: To see how you're loading the user, which helps if we need to pass custom claims to other services.
+
+### 3. From any Resource Service (e.g., `order-service/`)
+
+* **`src/main/resources/application.yml`**: To see if these services are already registered with the Discovery Server (Eureka).
+
+---
+
+### Why these files matter:
+
+The `application.yml` in the Gateway is the "Map" of your entire system. If we move security to the Gateway, we will be adding a **Global Filter** or a **Route Validator** there.
+
+Once you provide these, I can give you the **exact code** for the Gateway's `AuthenticationFilter` and the `RouteValidator` (which tells the Gateway which URLs like `/auth/login` should be ignored by the security check).
+
+**Which file would you like to share first?**

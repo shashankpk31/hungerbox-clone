@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workingSetManager>
-<workingSet editPageId="org.eclipse.jdt.internal.ui.DynamicSourcesWorkingSet" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1767521542671_0" label="Java Main Sources" name="Java Main Sources"/>
-<workingSet editPageId="org.eclipse.jdt.internal.ui.DynamicSourcesWorkingSet" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1767521542767_1" label="Java Test Sources" name="Java Test Sources"/>
-<workingSet editPageId="org.eclipse.ui.resourceWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1767528972798_3" label="backend-parent" name="backend-parent">
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/backend" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/api-gateway" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/config-server" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/discovery-server" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/identity" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/order-service" type="4"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/vendor-service" type="4"/>
-</workingSet>
-<workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1767521564881_2" label="Window Working Set" name="Aggregate for window 1767521564880"/>
+<workingSet editPageId="org.eclipse.jdt.internal.ui.DynamicSourcesWorkingSet" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1767799894967_0" label="Java Main Sources" name="Java Main Sources"/>
+<workingSet editPageId="org.eclipse.jdt.internal.ui.DynamicSourcesWorkingSet" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1767799895360_1" label="Java Test Sources" name="Java Test Sources"/>
+<workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1767799907158_2" label="Window Working Set" name="Aggregate for window 1767799907157"/>
 </workingSetManager>

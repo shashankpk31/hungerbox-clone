@@ -1,5 +1,0 @@
-package com.hungerbox.identity.repository;
-
-public class UserRepository {
-
-}

@@ -6,36 +6,35 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import com.hungerbox.identity.dto.response.ApiResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        StringBuilder errors = new StringBuilder();
-        ex.getBindingResult().getFieldErrors().forEach(error -> 
-            errors.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("; ")
-        );
-        
-        ApiResponse response = new ApiResponse(false, "Validation Failed", errors.toString());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-    
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
-        logger.error("Runtime Exception: {}", ex.getMessage());
-        ApiResponse response = new ApiResponse(false, "An error occurred", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ApiResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+		StringBuilder errors = new StringBuilder();
+		ex.getBindingResult().getFieldErrors().forEach(
+				error -> errors.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("; "));
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse> handleGeneralException(Exception ex) {
-        logger.error("Internal Server Error: ", ex);
-        ApiResponse response = new ApiResponse(false, "Internal Server Error", "Contact Admin");
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+		ApiResponse response = new ApiResponse(false, "Validation Failed", errors.toString());
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(RuntimeException.class)
+	public ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException ex) {
+		logger.error("Runtime Exception: {}", ex.getMessage());
+		ApiResponse response = new ApiResponse(false, "An error occurred", ex.getMessage());
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<ApiResponse> handleGeneralException(Exception ex) {
+		logger.error("Internal Server Error: ", ex);
+		ApiResponse response = new ApiResponse(false, "Internal Server Error", "Contact Admin");
+		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

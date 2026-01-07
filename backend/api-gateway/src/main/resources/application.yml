@@ -7,18 +7,27 @@ spring:
   cloud:
     gateway:
       routes:
+        # Open Route: No filter here
         - id: identity
           uri: lb://IDENTITY
           predicates:
-            - Path=/auth/**
+            - Path=/auth/** , /user/**
+
+        # Protected Route: AuthenticationFilter applied
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/orders/**
+          filters:
+            - JwtAuthenticationFilter
+
+        # Protected Route: AuthenticationFilter applied
         - id: vendor-service
           uri: lb://VENDOR-SERVICE
           predicates:
             - Path=/vendors/**
+          filters:
+            - JwtAuthenticationFilter
 
 eureka:
   client:

@@ -1,5 +1,0 @@
-package com.hungerbox.identity.service;
-
-public class AuthService {
-
-}
