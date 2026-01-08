@@ -11,23 +11,36 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
-public class User extends BaseEntity{
+public class User extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
+	@Column(unique = true, nullable = false)
+	private String username;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+	@Column(unique = true, nullable = false)
+	private String email;
 
-    @Column(nullable = false)
-    private String password;
+	@Column(nullable = false)
+	private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+	@Enumerated(EnumType.STRING)
+	private Role role;
+
+	@Column(nullable = true)
+	private String employeeId;
+
+	@Column(nullable = true)
+	private String companyName;
+
+	@Column(nullable = true)
+	private String shopName;
+	@Column(nullable = true)
+	private String gstNumber;
+	@Column(nullable = true)
+	private String contactNumber;
 
 	public Long getId() {
 		return id;
@@ -67,6 +80,46 @@ public class User extends BaseEntity{
 
 	public void setRole(Role role) {
 		this.role = role;
-	}    
-    
+	}
+
+	public String getEmployeeId() {
+		return employeeId;
+	}
+
+	public void setEmployeeId(String employeeId) {
+		this.employeeId = employeeId;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public String getShopName() {
+		return shopName;
+	}
+
+	public void setShopName(String shopName) {
+		this.shopName = shopName;
+	}
+
+	public String getGstNumber() {
+		return gstNumber;
+	}
+
+	public void setGstNumber(String gstNumber) {
+		this.gstNumber = gstNumber;
+	}
+
+	public String getContactNumber() {
+		return contactNumber;
+	}
+
+	public void setContactNumber(String contactNumber) {
+		this.contactNumber = contactNumber;
+	}
+
 }

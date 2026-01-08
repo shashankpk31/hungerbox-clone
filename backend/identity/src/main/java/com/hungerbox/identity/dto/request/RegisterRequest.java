@@ -2,6 +2,7 @@ package com.hungerbox.identity.dto.request;
 
 
 import com.hungerbox.identity.entity.Role;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,5 +22,16 @@ public record RegisterRequest(
     String password,
 
     @NotNull(message = "Role is required")
-    Role role
+    Role role,
+
+    // Employee Specific
+    String employeeId,
+    String companyName,
+
+    // Vendor Specific
+    String shopName,
+    String gstNumber,
+    String contactNumber,
+
+    String adminSecretCode 
 ) {}
