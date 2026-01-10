@@ -1,13 +1,38 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PhoneMockup from "../../../components/ui/PhoneMockup";
 import RegisterForm from "../../auth/components/RegisterForm";
 import LoginForm from "../../auth/components/LoginForm"; // Ensure this is imported
 import HeroContent from "../components/HeroContent";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
-  // 'hero', 'login', or 'register'
   const [view, setView] = useState("hero");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
+
+    if (token && storedUser) {
+      const user = JSON.parse(storedUser);
+      
+      // Role-based routing logic
+      switch (user.role) {
+        case "ROLE_ADMIN":
+          navigate("/admin");
+          break;
+        case "ROLE_VENDOR":
+          navigate("/vendor/dashboard");
+          break;
+        case "ROLE_EMPLOYEE":
+          navigate("/home");
+          break;
+        default:
+          navigate("/"); 
+      }
+    }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-hidden">

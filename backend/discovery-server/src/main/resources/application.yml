@@ -5,11 +5,30 @@ spring:
   application:
     name: discovery-server
 
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
 eureka:
   instance:
-    hostname: localhost
+     prefer-ip-address: true
   client:
     register-with-eureka: false
     fetch-registry: false
     service-url:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+eureka:
+  instance:
+    # Use the service name defined in docker-compose
+    hostname: discovery-server
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/

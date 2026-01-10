@@ -5,35 +5,67 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+      POSTGRES_MULTIPLE_DATABASES: hungerbox_identity,hungerbox_orders,hungerbox_vendor
+    volumes:
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     ports:
       - "5433:5432"
 
-  #  discovery-server:
-  #   build: ./discovery-server
-  #   ports:
-  #     - "8761:8761"
-  #   environment:
-  #     - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+  discovery-server:
+    build: ./backend/discovery-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
 
-  # config-server:
-  #   build: ./config-server
-  #   ports:
-  #     - "8888:8888"
-  #   depends_on:
-  #     - discovery-server
-  #   environment:
-  #     - SPRING_PROFILES_ACTIVE=native
-  #     - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+  config-server:
+    build: ./backend/config-server
+    depends_on:
+      - discovery-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
 
-  # api-gateway:
-  #   build: ./api-gateway
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - config-server
-  #   environment:
-  #     - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-  #     - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka/
+  api-gateway:
+    build: ./backend/api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  identity:
+    build: ./backend/identity
+    depends_on:
+      - postgres
+      - config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - CONFIG_SERVER_URL=http://config-server:8888
+
+  order-service:
+    build: ./backend/order-service
+    depends_on:
+      - postgres
+      - config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  vendor-service:
+    build: ./backend/vendor-service
+    depends_on:
+      - postgres
+      - config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_BASE_URL=http://localhost:8080
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
 
   redis:
     image: redis:alpine

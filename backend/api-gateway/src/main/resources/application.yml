@@ -19,21 +19,16 @@ spring:
             allowedHeaders: "*"
             allowCredentials: true
       routes:
-        # Open Route: No filter here
         - id: identity
-          uri: lb://IDENTITY
+          uri: lb://IDENTITY-SERVICE 
           predicates:
-            - Path=/auth/** , /user/**
-
-        # Protected Route: AuthenticationFilter applied
+            - Path=/auth/**, /user/**
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/orders/**
           filters:
             - JwtAuthenticationFilter
-
-        # Protected Route: AuthenticationFilter applied
         - id: vendor-service
           uri: lb://VENDOR-SERVICE
           predicates:
@@ -41,9 +36,24 @@ spring:
           filters:
             - JwtAuthenticationFilter
 
+# Profile specific Discovery URLs
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
 eureka:
   instance:
-    prefer-ip-address: true
+    ip-address: true
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
