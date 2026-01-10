@@ -2,5 +2,10 @@ import axiosInstance from '../../../api/axiosInstance';
 
 export const register = async (userData) => {
   const response = await axiosInstance.post('/auth/register', userData);
-  return response.data;
+  return response.data; // Should return { success: true, message: "..." }
+};
+
+export const login = async (credentials) => {
+  const response = await axiosInstance.post('/auth/login', credentials);
+  return response.data; // Should return { success: true, data: { token: "...", user: {...} } }
 };

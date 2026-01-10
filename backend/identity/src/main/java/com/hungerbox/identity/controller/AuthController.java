@@ -18,6 +18,7 @@ import com.hungerbox.identity.dto.request.AuthRequest;
 import com.hungerbox.identity.dto.request.RegisterRequest;
 import com.hungerbox.identity.dto.response.ApiResponse;
 import com.hungerbox.identity.dto.response.EmptyJson;
+import com.hungerbox.identity.dto.response.LoginResponse;
 import com.hungerbox.identity.service.AuthService;
 
 @RestController
@@ -45,10 +46,10 @@ public class AuthController {
 
 	@PostMapping("/login")
 	public ResponseEntity<ApiResponse> login(@RequestBody AuthRequest authRequest) {
-		logger.info("REST request to login user: {}", authRequest.username());
-		String token = authService.login(authRequest.username(), authRequest.password());
+		logger.info("REST request to login user: {}", authRequest.email());
+		LoginResponse response = authService.login(authRequest.email(), authRequest.password());
 		return ResponseEntity
-				.ok(new ApiResponse(true, Message.AUTH_LOGIN_SUCCESS.getMessage(), Map.of("token", token)));
+				.ok(new ApiResponse(true, Message.AUTH_LOGIN_SUCCESS.getMessage(), response));
 	}
 
 	@GetMapping("/validate")

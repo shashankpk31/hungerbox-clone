@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, User, Mail, Lock, Briefcase, Store } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 import AuthToggle from "../../../components/ui/Toggle/AuthToggle";
 import EmployeeFields from "./forms/EmployeeFields";
 import VendorFields from "./forms/VendorFields";
-import { useAuth } from "../../../context/AuthContext";
 import { register } from "../services/authService";
 
 const RegisterForm = ({ onSwitchToLogin, onBack }) => {
-  const [role, setRole] = useState("EMPLOYEE"); // 'EMPLOYEE' or 'VENDOR'
+  const navigate = useNavigate();
+  const [role, setRole] = useState("ROLE_EMPLOYEE"); 
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
-    // Role specific fields will be merged here
   });
 
   const handleInputChange = (e) => {
@@ -27,32 +27,16 @@ const RegisterForm = ({ onSwitchToLogin, onBack }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
-    // payload constructed as per our RegisterRequest.java record
-    const payload = {
-      ...formData,
-      role,
-      // These might be undefined if not visible, which is fine for the record
-      employeeId: formData.employeeId,
-      companyName: formData.companyName,
-      shopName: formData.shopName,
-      gstNumber: formData.gstNumber,
-    };
-
+    const payload = { ...formData, role };
+    
     try {
-      // 1. Call your API
-      const response = await register(payload);
-
-      if (response.success) {
-        // 2. Since your requirement says redirect to login screen on success:
-        alert("Registration Successful! Please login.");
-        onSwitchToLogin();
-      }
-    } catch (error) {
-      console.error(
-        "Registration failed",
-        error.response?.data?.message || error.message
-      );
+      await register(payload);
+      // Registration successful, send them to login
+      onSwitchToLogin(); 
+    } catch (err) {
+      setError(err.response?.data?.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -60,12 +44,8 @@ const RegisterForm = ({ onSwitchToLogin, onBack }) => {
 
   return (
     <div className="w-full max-w-md">
-      {/* Header & Back Action */}
       <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={onBack}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
+        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full">
           <ArrowLeft size={20} className="text-gray-600" />
         </button>
         <AuthToggle activeRole={role} setRole={setRole} />
@@ -73,47 +53,24 @@ const RegisterForm = ({ onSwitchToLogin, onBack }) => {
 
       <div className="mb-6">
         <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
-        <p className="text-gray-500 mt-1">
-          Join HungerBox as a {role.toLowerCase()}.
-        </p>
+        <p className="text-gray-500 mt-1">Join HungerBox as a {role === "ROLE_EMPLOYEE" ? "Employee" : "Vendor"}.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-1">
-        {/* Common Fields */}
-        <Input
-          label="Full Name"
-          name="username"
-          placeholder="John Doe"
-          onChange={handleInputChange}
-          required
-        />
-        <Input
-          label="Email Address"
-          name="email"
-          type="email"
-          placeholder="john@company.com"
-          onChange={handleInputChange}
-          required
-        />
-        <Input
-          label="Password"
-          name="password"
-          type="password"
-          placeholder="••••••••"
-          onChange={handleInputChange}
-          required
-        />
+      {error && <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-md">{error}</div>}
 
-        {/* Dynamic Fields based on Toggle */}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <Input label="Full Name" name="username" placeholder="John Doe" onChange={handleInputChange} required />
+        <Input label="Email Address" name="email" type="email" placeholder="john@company.com" onChange={handleInputChange} required />
+        <Input label="Password" name="password" type="password" placeholder="••••••••" onChange={handleInputChange} required />
+
         <AnimatePresence mode="wait">
           <motion.div
             key={role}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
           >
-            {role === "EMPLOYEE" ? (
+            {role === "ROLE_EMPLOYEE" ? (
               <EmployeeFields onDataChange={handleInputChange} />
             ) : (
               <VendorFields onDataChange={handleInputChange} />
@@ -122,7 +79,7 @@ const RegisterForm = ({ onSwitchToLogin, onBack }) => {
         </AnimatePresence>
 
         <div className="pt-4">
-          <Button type="submit">
+          <Button type="submit" className="w-full">
             {loading ? "Creating Account..." : "Register Now"}
           </Button>
         </div>
@@ -130,10 +87,7 @@ const RegisterForm = ({ onSwitchToLogin, onBack }) => {
 
       <p className="mt-6 text-center text-gray-600">
         Already have an account?{" "}
-        <button
-          onClick={onSwitchToLogin}
-          className="text-orange-600 font-bold hover:underline"
-        >
+        <button onClick={onSwitchToLogin} className="text-orange-600 font-bold hover:underline">
           Sign In
         </button>
       </p>

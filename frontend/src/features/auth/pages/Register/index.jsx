@@ -42,7 +42,8 @@ const RegisterPage = () => {
             </div>
           )}
           
-          <RegisterForm onSubmit={handleRegister} loading={loading} />
+          <RegisterForm onSwitchToRegister={() => window.location.href = '/'} 
+          onBack={() => window.location.href = '/'}  onSubmit={handleRegister} loading={loading} />
 
           <div className="mt-6 text-center">
             <span className="text-sm text-gray-600">Already using HungerBox? </span>

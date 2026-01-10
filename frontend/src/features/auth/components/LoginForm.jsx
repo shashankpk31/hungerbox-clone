@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Lock, Mail } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { useAuth } from "../../../context/AuthContext";
+import { login } from "../services/authService";
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
 
 const LoginForm = ({ onSwitchToRegister, onBack }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const { loginUser } = useAuth();
+  const navigate = useNavigate();
+  
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,13 +21,16 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate API Call
+    setError(null);
+
     try {
-      console.log("Logging in with:", formData);
-      // await authService.login(formData);
-    } catch (error) {
-      console.error("Login failed", error);
+      const response = await login(formData);
+      console.log(response);
+      
+      loginUser(response.data.user, response.data.token);      
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -32,11 +38,7 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
 
   return (
     <div className="w-full">
-      {/* Back Button */}
-      <button 
-        onClick={onBack}
-        className="flex items-center text-gray-500 hover:text-orange-600 transition-colors mb-6 group"
-      >
+      <button onClick={onBack} className="flex items-center text-gray-500 hover:text-orange-600 mb-6 group">
         <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
         <span className="text-sm font-medium">Back to Home</span>
       </button>
@@ -46,7 +48,13 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
         <p className="text-gray-500 mt-2">Enter your details to access your HungerBox account.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-2">
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
         <Input 
           label="Business Email"
           name="email"
@@ -67,17 +75,13 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
           required
         />
 
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-end">
           <button type="button" className="text-sm font-semibold text-orange-600 hover:text-orange-700">
             Forgot Password?
           </button>
         </div>
 
-        <Button 
-          type="submit" 
-          variant="primary" 
-          className="h-14"
-        >
+        <Button type="submit" variant="primary" className="w-full h-14">
           {loading ? "Authenticating..." : "Sign In"}
         </Button>
       </form>
@@ -85,10 +89,7 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
       <div className="mt-8 text-center">
         <p className="text-gray-600">
           Don't have an account?{' '}
-          <button 
-            onClick={onSwitchToRegister}
-            className="text-orange-600 font-bold hover:underline underline-offset-4"
-          >
+          <button onClick={onSwitchToRegister} className="text-orange-600 font-bold hover:underline">
             Create one for free
           </button>
         </p>

@@ -16,13 +16,15 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (userData, token) => {
+  const loginUser = (userData, token) => {
+    console.log(`data from login User ${userData}, ${token} `);
+    
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData)); // Store user details
     setUser(userData);
   };
 
-  const logout = () => {
+  const logoutUser = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
@@ -32,7 +34,7 @@ export const AuthProvider = ({ children }) => {
   const role = user?.role || null;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, role, loading }}>
+    <AuthContext.Provider value={{ user, loginUser, logoutUser, isAuthenticated, role, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
