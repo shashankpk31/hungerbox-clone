@@ -5,7 +5,26 @@ spring:
   application:
     name: config-server
 
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
 eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
