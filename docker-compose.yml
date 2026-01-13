@@ -3,11 +3,12 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: user
+      POSTGRES_USER: hbadmin
       POSTGRES_PASSWORD: password
       POSTGRES_MULTIPLE_DATABASES: hungerbox_identity,hungerbox_orders,hungerbox_vendor
     volumes:
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
 
@@ -82,3 +83,5 @@ services:
     image: openzipkin/zipkin
     ports:
       - "9411:9411"
+  volumes:
+  postgres_data:

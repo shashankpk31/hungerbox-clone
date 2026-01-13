@@ -38,7 +38,7 @@ spring:
       on-profile: prod
   datasource:
     url: jdbc:postgresql://postgres:5432/hungerbox_orders
-    username: user
+    username: hbadmin
     password: password
   jpa:
     hibernate:
