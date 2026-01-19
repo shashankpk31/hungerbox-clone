@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8089
 
 spring:
   application:
@@ -33,6 +33,30 @@ spring:
           uri: lb://VENDOR-SERVICE
           predicates:
             - Path=/vendors/**
+          filters:
+            - JwtAuthenticationFilter
+        - id: menu-service
+          uri: lb://MENU-SERVICE
+          predicates:
+            - Path=/menus/**
+          filters:
+            - JwtAuthenticationFilter
+        - id: inventory-service
+          uri: lb://INVENTORY-SERVICE
+          predicates:
+            - Path=/inventory/**
+          filters:
+            - JwtAuthenticationFilter
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment/**
+          filters:
+            - JwtAuthenticationFilter
+        - id: wallet-service
+          uri: lb://WALLET-SERVICE
+          predicates:
+            - Path=/wallet/**
           filters:
             - JwtAuthenticationFilter
 

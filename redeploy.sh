@@ -9,7 +9,7 @@ docker-compose down
 
 echo -e "${YELLOW}Step 2: Building Microservices...${NC}"
 # MATCHED EXACTLY TO YOUR FOLDER LIST
-SERVICES=("discovery-server" "config-server" "api-gateway" "identity" "order-service" "vendor-service")
+SERVICES=("discovery-server" "config-server" "api-gateway" "identity" "order-service" "vendor-service""menu-service""inventory-service""wallet-service""payment-service")
 
 for SERVICE in "${SERVICES[@]}"; do
     if [ -d "backend/$SERVICE" ]; then
