@@ -5,11 +5,11 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 echo -e "${YELLOW}Step 1: Cleaning up containers...${NC}"
-docker-compose down
+docker-compose down -v
 
 echo -e "${YELLOW}Step 2: Building Microservices...${NC}"
 # MATCHED EXACTLY TO YOUR FOLDER LIST
-SERVICES=("discovery-server" "config-server" "api-gateway" "identity" "order-service" "vendor-service""menu-service""inventory-service""wallet-service""payment-service")
+SERVICES=("discovery-server" "config-server" "api-gateway" "identity" "order-service" "vendor-service" "menu-service" "inventory-service" "wallet-service" "payment-service")
 
 for SERVICE in "${SERVICES[@]}"; do
     if [ -d "backend/$SERVICE" ]; then

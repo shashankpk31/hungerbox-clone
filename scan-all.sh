@@ -1,8 +1,8 @@
 SONAR_TOKEN="YOUR_GENERATED_TOKEN"
-SONAR_URL="http://host.docker.internal:9000"
+SONAR_URL="http://localhost:9000"
 
 # --- SCAN BACKEND SERVICES ---
-SERVICES=("discovery-server" "config-server" "api-gateway" "identity" "order-service" "vendor-service""menu-service""inventory-service""wallet-service""payment-service")
+SERVICES=("discovery-server" "config-server" "api-gateway" "identity" "order-service" "vendor-service" "menu-service" "inventory-service" "wallet-service" "payment-service")
 
 for service in "${SERVICES[@]}"
 do
