@@ -1,17 +1,30 @@
 spring:
   application:
     name: menu-service
+  profiles:
+    active: dev
   cloud:
     config:
-      # If running locally, this hits localhost. In Docker, the ENV var overrides it.
       uri: ${CONFIG_SERVER_URL:http://localhost:8888}
       fail-fast: true
-  profiles:
-    active: dev # Default to dev for local IDE running
----
-# Local Development Profile
+  # Common Defaults
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
 server:
   port: 8084
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+---
+# Local Development
 spring:
   config:
     activate:
@@ -20,18 +33,9 @@ spring:
     url: jdbc:postgresql://localhost:5433/hungerbox_menu
     username: user
     password: password
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+
 ---
-# Docker Production Profile
+# Docker Production
 spring:
   config:
     activate:
@@ -44,9 +48,8 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     service-url:
       defaultZone: http://discovery-server:8761/eureka/

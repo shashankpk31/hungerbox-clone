@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Input from "../../../components/ui/Input";
-import Button from "../../../components/ui/Button";
+import {Button} from "../../../components/ui/Button";
 import AuthToggle from "../../../components/ui/Toggle/AuthToggle";
 import EmployeeFields from "./forms/EmployeeFields";
 import VendorFields from "./forms/VendorFields";

@@ -4,12 +4,10 @@ server:
 spring:
   application:
     name: config-server
+  profiles:
+    active: dev
 
----
-spring:
-  config:
-    activate:
-      on-profile: dev
+# Common Discovery Settings
 eureka:
   instance:
     prefer-ip-address: true
@@ -18,13 +16,13 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 ---
+# Production Override
 spring:
   config:
     activate:
       on-profile: prod
+
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     service-url:
       defaultZone: http://discovery-server:8761/eureka/

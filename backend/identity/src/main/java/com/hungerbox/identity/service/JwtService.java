@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.hungerbox.identity.entity.User;
+
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,10 +36,13 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(String username, String role) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
-        return createToken(claims, username);
+        claims.put("userId", user.getId());
+        claims.put("role", user.getRole().name());
+        claims.put("orgId", user.getOrganizationId());
+        claims.put("officeId", user.getOfficeId());
+        return createToken(claims, user.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {

@@ -18,10 +18,13 @@ public class ErrorMessageWarnConstant {
     }
 
     public enum Error {
+    	PHONE_ALREADY_REGISTERED("Phone number already registered"),
         USER_NOT_FOUND("The requested user does not exist"),
         INVALID_CREDENTIALS("Invalid username or password"),
-        INTERNAL_SERVER_ERROR("An unexpected error occurred");
-
+        UNAUTHORIZED("User Not Authorized"),
+        INTERNAL_SERVER_ERROR("An unexpected error occurred"),
+    	INVALID_EXPIRED_OTP("Invalid or expired OTP");
+    	
         private final String message;
 
         Error(String message) {
@@ -37,8 +40,9 @@ public class ErrorMessageWarnConstant {
         AUTH_REG_SUCCESS("User registered successfully"),
         AUTH_LOGIN_SUCCESS("User Login Successful"),
         VALID_TOKEN("Token is valid"),
-        PASSWORD_RESET_LINK_SENT("A reset link has been sent to your email");
-
+        PASSWORD_RESET_LINK_SENT("A reset link has been sent to your email"),
+    	ACC_VERIFIED("Account verified successfully");
+    	
         private final String message;
 
         Message(String message) {

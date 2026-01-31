@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { login } from "../services/authService";
-import Input from '../../../components/ui/Input';
-import Button from '../../../components/ui/Button';
+import Input from "../../../components/ui/Input";
+import { Button } from "../../../components/ui/Button";
 
 const LoginForm = ({ onSwitchToRegister, onBack }) => {
-  const { loginUser } = useAuth();
+  const { saveLoginDetails } = useAuth();
   const navigate = useNavigate();
-  
-  const [formData, setFormData] = useState({ email: '', password: '' });
+
+  const [formData, setFormData] = useState({
+    userIdentifier: "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -25,12 +28,11 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
 
     try {
       const response = await login(formData);
-      console.log(response);
-      
-      loginUser(response.data.user, response.data.token);      
-      navigate('/');
+      saveLoginDetails(response.user, response.token);
+      navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid email or password");
+      // 'err' is now the string message rejected by your interceptor
+      setError(err || "Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -38,14 +40,22 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
 
   return (
     <div className="w-full">
-      <button onClick={onBack} className="flex items-center text-gray-500 hover:text-orange-600 mb-6 group">
-        <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+      <button
+        onClick={onBack}
+        className="flex items-center text-gray-500 hover:text-orange-600 mb-6 group"
+      >
+        <ArrowLeft
+          size={18}
+          className="mr-2 group-hover:-translate-x-1 transition-transform"
+        />
         <span className="text-sm font-medium">Back to Home</span>
       </button>
 
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-        <p className="text-gray-500 mt-2">Enter your details to access your HungerBox account.</p>
+        <p className="text-gray-500 mt-2">
+          Enter your details to access your HungerBox account.
+        </p>
       </div>
 
       {error && (
@@ -55,17 +65,17 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input 
-          label="Business Email"
-          name="email"
-          type="email"
-          placeholder="name@company.com"
-          value={formData.email}
+        <Input
+          label="Buiesness Email or Phone Number"
+          name="userIdentifier"
+          type="text"
+          placeholder="name@company.com or 7867546787"
+          value={formData.userIdentifier}
           onChange={handleChange}
           required
         />
 
-        <Input 
+        <Input
           label="Password"
           name="password"
           type="password"
@@ -76,7 +86,10 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
         />
 
         <div className="flex justify-end">
-          <button type="button" className="text-sm font-semibold text-orange-600 hover:text-orange-700">
+          <button
+            type="button"
+            className="text-sm font-semibold text-orange-600 hover:text-orange-700"
+          >
             Forgot Password?
           </button>
         </div>
@@ -88,8 +101,11 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
 
       <div className="mt-8 text-center">
         <p className="text-gray-600">
-          Don't have an account?{' '}
-          <button onClick={onSwitchToRegister} className="text-orange-600 font-bold hover:underline">
+          Don't have an account?{" "}
+          <button
+            onClick={onSwitchToRegister}
+            className="text-orange-600 font-bold hover:underline"
+          >
             Create one for free
           </button>
         </p>

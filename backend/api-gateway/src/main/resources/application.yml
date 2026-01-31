@@ -32,7 +32,7 @@ spring:
         - id: vendor-service
           uri: lb://VENDOR-SERVICE
           predicates:
-            - Path=/vendors/**
+            - Path=/vendors/**, /organization**
           filters:
             - JwtAuthenticationFilter
         - id: menu-service

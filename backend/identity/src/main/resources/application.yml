@@ -1,29 +1,24 @@
 spring:
   application:
     name: identity-service
+  profiles:
+    active: dev
   cloud:
     config:
-      # If running locally, this hits localhost. In Docker, the ENV var overrides it.
       uri: ${CONFIG_SERVER_URL:http://localhost:8888}
       fail-fast: true
-  profiles:
-    active: dev # Default to dev for local IDE running
----
-# Local Development Profile
-server:
-  port: 8081
-spring:
-  config:
-    activate:
-      on-profile: dev
-  datasource:
-    url: jdbc:postgresql://localhost:5433/hungerbox_identity
-    username: user
-    password: password
+  # Global Defaults
+  data:
+    redis:
+      host: redis
+      port: 6379
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+server:
+  port: 8081
 
 eureka:
   instance:
@@ -31,6 +26,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
 ---
 # Docker Production Profile
 spring:
@@ -45,9 +41,22 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: 5672
+
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     service-url:
       defaultZone: http://discovery-server:8761/eureka/
+
+---
+# Local Development Overrides (Optional)
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5433/hungerbox_identity
+    username: user
+    password: password

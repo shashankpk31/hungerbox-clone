@@ -3,18 +3,25 @@ package com.hungerbox.identity.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreRemove;
+import jakarta.persistence.PreUpdate;
+
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.hungerbox.identity.eventlistener.CustomAuditListener;
 
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-@EntityListeners({AuditingEntityListener.class,CustomAuditListener.class})
+@EntityListeners({ AuditingEntityListener.class, CustomAuditListener.class })
+@SQLRestriction("deleted = false")
 public abstract class BaseEntity {
 
 	@CreatedDate
@@ -33,7 +40,6 @@ public abstract class BaseEntity {
 	@Column(insertable = false)
 	private String updatedBy;
 
-	// Soft Delete Field
 	@Column(nullable = false)
 	private boolean deleted = false;
 
@@ -75,5 +81,39 @@ public abstract class BaseEntity {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	@PrePersist
+	public void onPrePersist() {
+		this.createdAt = LocalDateTime.now();
+		String currentUser = "SYSTEM";
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            currentUser = auth.getName();
+        }
+		this.createdBy = currentUser;
+	}
+
+	@PreUpdate
+	public void onPreUpdate() {
+		this.updatedAt = LocalDateTime.now();
+		String currentUser = "SYSTEM";
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            currentUser = auth.getName();
+        }
+		this.updatedBy = currentUser;
+	}
+
+	@PreRemove
+	public void onPreRemove() {
+		this.deleted = true;
+		this.updatedAt = LocalDateTime.now();
+		String currentUser = "SYSTEM";
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            currentUser = auth.getName();
+        }
+		this.updatedBy = currentUser;
 	}
 }

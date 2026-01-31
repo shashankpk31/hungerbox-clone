@@ -31,6 +31,14 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
+	@ExceptionHandler(feign.FeignException.class)
+	public ResponseEntity<ApiResponse> handleFeignStatusException(feign.FeignException e) {
+	    logger.error("Feign Client Error: Status {}, Message: {}", e.status(), e.contentUTF8());
+	    // Extract the message from the other service if possible
+	    String message = "Service Communication Error: " + (e.contentUTF8().isEmpty() ? e.getMessage() : e.contentUTF8());
+	    return new ResponseEntity<>(new ApiResponse(false, "Remote Service Failure", message), HttpStatus.BAD_GATEWAY);
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponse> handleGeneralException(Exception ex) {
 		logger.error("Internal Server Error: ", ex);

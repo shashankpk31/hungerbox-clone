@@ -1,35 +1,97 @@
-import { Routes, Route,Navigate } from "react-router-dom";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
+import { ROLES } from "../config/constants";
+import { LayoutDashboard, Building2, MapPin, CheckCircle } from "lucide-react";
+
+// Layouts
+import DashboardLayout from "../layouts/DashboardLayout";
+
 import LandingPage from "../features/home/pages/LandingPage";
-import AdminRegister from "../features/auth/pages/AdminRegister";
-import EmployeeHome from "../features/employee/pages/Home";
-import KitchenDisplay from "../features/vendor/pages/LiveOrders";
-import Login from "../features/auth/pages/Login"; 
+import SuperAdminOverview from "../features/admin/pages/SuperAdminOverview"; // Moved from super-admin to admin
+import OrganizationManager from "../features/admin/pages/OrganizationManager"; // Moved to admin
+import ApprovalDashboard from "../features/org-admin/pages/ApprovalDashboard";
+import OrgDashboard from "../features/org-admin/pages/OrgDashboard";
+
 
 const AppRoutes = () => {
+  const superAdminNav = [
+    {
+      label: "Dashboard",
+      path: "/admin/dashboard",
+      icon: <LayoutDashboard size={20} />,
+    },
+    {
+      label: "Organizations",
+      path: "/admin/organizations",
+      icon: <Building2 size={20} />,
+    },
+  ];
+
+  const orgAdminNav = [
+    {
+      label: "Organisation Dashboard",
+      path: "/org-admin/approvals",
+      icon: <CheckCircle size={20} />,
+    },
+    {
+      label: "Pending Approvals",
+      path: "/org-admin/approvals",
+      icon: <CheckCircle size={20} />,
+    },
+    {
+      label: "Locations",
+      path: "/admin/locations",
+      icon: <MapPin size={20} />,
+    },
+  ];
+
   return (
     <Routes>
-      {/* 1. Public Routes: Accessible only if NOT logged in */}
+      {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/admin-registration" element={<AdminRegister />} />
 
-      {/* 2. Employee Routes */}
-      <Route element={<ProtectedRoute allowedRoles={['ROLE_EMPLOYEE']} />}>
-        <Route path="/home" element={<EmployeeHome />} />
+      {/* Super Admin Module (Role: ROLE_SUPER_ADMIN) */}
+      <Route element={<ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN]} />}>
+        <Route
+          element={
+            <DashboardLayout
+              navigationLinks={superAdminNav}
+              brandName="HB | Super"
+            />
+          }
+        >
+          <Route path="admin/dashboard" element={<SuperAdminOverview />} />
+          <Route path="admin/organizations" element={<OrganizationManager />} />
+          {/* Default redirect for the module */}
+          <Route
+            path="admin"
+            element={<Navigate to="/admin/dashboard" replace />}
+          />
+        </Route>
       </Route>
 
-      {/* 3. Vendor Routes */}
-      <Route element={<ProtectedRoute allowedRoles={['ROLE_VENDOR']} />}>
-        <Route path="/vendor/dashboard" element={<KitchenDisplay />} />
+      {/* Org Admin Module (Role: ROLE_ORG_ADMIN) */}
+      <Route element={<ProtectedRoute allowedRoles={[ROLES.ORG_ADMIN]} />}>
+        <Route
+          element={
+            <DashboardLayout
+              navigationLinks={orgAdminNav}
+              brandName="HB | Org"
+            />
+          }
+        >
+          <Route path="org-admin/dashboard" element={<OrgDashboard />} />
+
+          <Route path="org-admin/approvals" element={<ApprovalDashboard />} />
+          <Route
+            path="org-admin"
+            element={<Navigate to="/org-admin/dashboard" replace />}
+          />
+        </Route>
       </Route>
 
-      {/* 4. Admin Routes */}
-      <Route element={<ProtectedRoute allowedRoles={['ROLE_ADMIN']} />}>
-        <Route path="/admin" element={<div>Admin Dashboard</div>} />
-      </Route>
-
-      {/* 5. Fallback: If route doesn't exist */}
+      {/* Fallback for undefined routes */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

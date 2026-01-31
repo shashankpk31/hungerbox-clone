@@ -1,3 +1,5 @@
+### Script in python which prints the project strcuture all the files and folders available
+
 import os
 
 def print_tree(startpath, exclude_dirs, exclude_files):

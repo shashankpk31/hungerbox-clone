@@ -4,25 +4,10 @@ server:
 spring:
   application:
     name: discovery-server
+  profiles:
+    active: dev
 
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-eureka:
-  instance:
-     prefer-ip-address: true
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-    service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
----
-spring:
-  config:
-    activate:
-      on-profile: prod
+# Common Eureka Server settings
 eureka:
   instance:
     prefer-ip-address: true
@@ -30,4 +15,15 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://discovery-server:8761/eureka/
+      defaultZone: http://${eureka.instance.hostname:localhost}:${server.port}/eureka/
+
+---
+# Docker Production Profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+eureka:
+  instance:
+    hostname: discovery-server

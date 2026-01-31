@@ -1,6 +1,6 @@
 package com.hungerbox.identity.dto.response;
 
-import com.hungerbox.identity.entity.Role;
+import com.hungerbox.identity.constant.IdentityConstantAndEnum.Role;
 
 public class UserResponse {
 	private String username;
