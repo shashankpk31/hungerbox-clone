@@ -11,9 +11,9 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response.data.success ? response.data.data : Promise.reject(response.data.message),
   (error) => {
-    const message = error.response?.data?.message || ERR.GENERIC_ERROR;
     
-    // Auto-toast for specific system errors
+    const message = error.response?.data?.error || ERR.GENERIC_ERROR;
+    
     if (error.response?.status === 403) {
       toast.error("Access Denied: You don't have permission.");
     }

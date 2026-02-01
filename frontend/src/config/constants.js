@@ -33,3 +33,11 @@ export const UI_CONFIG = {
   CARD_STYLE: "bg-white rounded-hb border border-surface-border shadow-sm",
   PAGE_PADDING: "p-6 lg:p-10",
 };
+
+
+export const LANDING_PAGE_VIEW = {
+  HOME: 'hero', 
+  LOGIN: 'login',    
+  REGISTER: 'register', 
+  ACC_VERIFY: 'verify',      
+};

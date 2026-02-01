@@ -120,17 +120,27 @@ public class AuthService {
 
 	public LoginResponse login(String loginIdentifier, String password) {
 		LoginResponse response = new LoginResponse();
-		User existingUser = userRepository.findByEmailOrPhoneNumber(loginIdentifier, loginIdentifier).orElseThrow(
-				() -> new UsernameNotFoundException(ErrorMessageWarnConstant.Error.USER_NOT_FOUND.getMessage()));
+	    User existingUser = userRepository.findByEmailOrPhoneNumber(loginIdentifier, loginIdentifier)
+	            .orElseThrow(() -> new UsernameNotFoundException(Error.USER_NOT_FOUND.getMessage()));
 
-		String token = Optional.of(existingUser).filter(user -> passwordEncoder.matches(password, user.getPassword()))
-				.map(user -> jwtService.generateToken(user)).orElseThrow(() -> {
-					logger.error("Authentication failed for user: {}", loginIdentifier);
-					return new RuntimeException(Error.INVALID_CREDENTIALS.getMessage());
-				});
-		response.setUser(userMapper.toResponse(existingUser));
-		response.setToken(token);
-		return response;
+	    // 1. Validate Password
+	    if (!passwordEncoder.matches(password, existingUser.getPassword())) {
+	        throw new RuntimeException(Error.INVALID_CREDENTIALS.getMessage());
+	    }
+
+	    // 2. BLOCK LOGIN if not verified
+	    boolean verified = existingUser.getIsEmailVerified() != null && existingUser.getIsEmailVerified() || 
+	                       existingUser.getIsPhoneVerified() != null && existingUser.getIsPhoneVerified();
+	    
+	    if (!verified) {
+	        throw new RuntimeException(Error.ACCOUNT_NOT_VERIFIED.getMessage());
+	    }
+
+	    // 3. Generate Token if verified
+	    String token = jwtService.generateToken(existingUser);
+	    response.setUser(userMapper.toResponse(existingUser));
+	    response.setToken(token);
+	    return response;
 	}
 
 	public void validateToken(String token) {

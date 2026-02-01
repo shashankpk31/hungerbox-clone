@@ -2,11 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
-import { login } from "../services/authService";
+import { authService } from "../services/authService";
 import Input from "../../../components/ui/Input";
 import { Button } from "../../../components/ui/Button";
+import toast from "react-hot-toast"; 
+import { ERR, MSG } from "../../../config/errMsgConstants";
+import { ROLES } from "../../../config/constants";
 
-const LoginForm = ({ onSwitchToRegister, onBack }) => {
+
+const LoginForm = ({ onSwitchToRegister, onBack, onUnverified }) => {
   const { saveLoginDetails } = useAuth();
   const navigate = useNavigate();
 
@@ -19,6 +23,7 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError(null); 
   };
 
   const handleSubmit = async (e) => {
@@ -27,12 +32,29 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
     setError(null);
 
     try {
-      const response = await login(formData);
-      saveLoginDetails(response.user, response.token);
-      navigate("/");
-    } catch (err) {
-      // 'err' is now the string message rejected by your interceptor
-      setError(err || "Invalid email or password");
+      const response = await authService.login(formData);
+      
+      console.log(response);
+      
+      const { user, token } = response;
+      
+      saveLoginDetails(user, token);
+      toast.success(MSG.LOGIN_SUCCESS);
+      
+      if (user.role === ROLES.EMPLOYEE) navigate("/home");
+      else navigate("/admin/dashboard");
+
+    } catch (err) {      
+      console.log(err);
+      
+      if (err === ERR.ACC_NOT_VERIFIED) {
+        toast.error("Account not verified yet. Redirecting...");
+        onUnverified(formData.userIdentifier);
+      } else {
+        const finalError = err || ERR.INVALID_CREDENTIALS;
+        setError(finalError);
+        toast.error(finalError);
+      }
     } finally {
       setLoading(false);
     }
@@ -42,7 +64,7 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
     <div className="w-full">
       <button
         onClick={onBack}
-        className="flex items-center text-gray-500 hover:text-orange-600 mb-6 group"
+        className="flex items-center text-gray-500 hover:text-orange-600 mb-6 group transition-colors"
       >
         <ArrowLeft
           size={18}
@@ -66,7 +88,7 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
-          label="Buiesness Email or Phone Number"
+          label="Business Email or Phone Number"
           name="userIdentifier"
           type="text"
           placeholder="name@company.com or 7867546787"
@@ -94,7 +116,7 @@ const LoginForm = ({ onSwitchToRegister, onBack }) => {
           </button>
         </div>
 
-        <Button type="submit" variant="primary" className="w-full h-14">
+        <Button type="submit" variant="primary" className="w-full h-14" disabled={loading}>
           {loading ? "Authenticating..." : "Sign In"}
         </Button>
       </form>

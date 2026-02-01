@@ -7,7 +7,7 @@ import {Button} from "../../../components/ui/Button";
 import AuthToggle from "../../../components/ui/Toggle/AuthToggle";
 import EmployeeFields from "./forms/EmployeeFields";
 import VendorFields from "./forms/VendorFields";
-import { register } from "../services/authService";
+import {authService} from "../services/authService";
 
 const RegisterForm = ({ onSwitchToLogin, onBack }) => {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ const RegisterForm = ({ onSwitchToLogin, onBack }) => {
     username: "",
     email: "",
     password: "",
+    phoneNumber:""
   });
 
   const handleInputChange = (e) => {
@@ -32,9 +33,9 @@ const RegisterForm = ({ onSwitchToLogin, onBack }) => {
     const payload = { ...formData, role };
     
     try {
-      await register(payload);
-      // Registration successful, send them to login
-      onSwitchToLogin(); 
+      await authService.register(payload);
+      const identifier = formData.email || formData.phoneNumber;
+      navigate("/verify", { state: { identifier: identifier } });
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -62,6 +63,7 @@ const RegisterForm = ({ onSwitchToLogin, onBack }) => {
         <Input label="Full Name" name="username" placeholder="John Doe" onChange={handleInputChange} required />
         <Input label="Email Address" name="email" type="email" placeholder="john@company.com" onChange={handleInputChange} required />
         <Input label="Password" name="password" type="password" placeholder="••••••••" onChange={handleInputChange} required />
+        <Input label="Phone Number" name="phoneNumber" placeholder="+91 9876543210" onChange={handleInputChange}  />
 
         <AnimatePresence mode="wait">
           <motion.div

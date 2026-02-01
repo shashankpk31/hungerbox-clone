@@ -3,36 +3,43 @@ import { motion, AnimatePresence } from "framer-motion";
 import PhoneMockup from "../../../components/ui/PhoneMockup";
 import RegisterForm from "../../auth/components/RegisterForm";
 import LoginForm from "../../auth/components/LoginForm";
+import AccountVerifyForm from "../../auth/components/AccountVerifyForm"; 
 import HeroContent from "../components/HeroContent";
 import { useNavigate } from "react-router-dom";
-import { LOCL_STRG_KEY, ROLES } from "../../../config/constants";
+import { LOCL_STRG_KEY, ROLES, LANDING_PAGE_VIEW } from "../../../config/constants";
+import { scaleAnimation, fadeAnimation } from "../../../config/animations";
 
 const LandingPage = () => {
-  const [view, setView] = useState("hero");
+  const [view, setView] = useState(LANDING_PAGE_VIEW.HOME);
+  const [pendingIdentifier, setPendingIdentifier] = useState(""); 
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem(LOCL_STRG_KEY.TOKEN);
     const storedUser = localStorage.getItem(LOCL_STRG_KEY.USER);
 
-    // Use window.location.pathname check to prevent loop
     if (token && storedUser && window.location.pathname === "/") {
       try {
         const user = JSON.parse(storedUser);
         const routes = {
-          [ROLES.SUPER_ADMIN]: "/admin/dashboard", // Fixed spelling
-          [ROLES.ORG_ADMIN]: "/org-admin/dashboard", // Fixed spelling
+          [ROLES.SUPER_ADMIN]: "/admin/dashboard",
+          [ROLES.ORG_ADMIN]: "/org-admin/dashboard",
           [ROLES.VENDOR]: "/vendor/dashboard",
           [ROLES.EMPLOYEE]: "/home",
         };
 
         const targetPath = routes[user.role] || "/";
-        navigate(targetPath, { replace: true }); // Use replace: true
+        navigate(targetPath, { replace: true });
       } catch (e) {
-        localStorage.clear(); // Clear corrupt data
+        localStorage.clear();
       }
     }
   }, [navigate]);
+
+  const handleRegistrationSuccess = (identifier) => {
+    setPendingIdentifier(identifier);
+    setView(LANDING_PAGE_VIEW.ACC_VERIFY);
+  };
 
   return (
     <div className="h-screen w-full bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-hidden flex flex-col">
@@ -42,20 +49,20 @@ const LandingPage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="text-2xl font-bold text-orange-600 cursor-pointer"
-          onClick={() => setView("hero")}
+          onClick={() => setView(LANDING_PAGE_VIEW.HOME)}
         >
           HungerBox
         </motion.h1>
 
         <div className="flex items-center space-x-6">
           <button
-            onClick={() => setView("login")}
+            onClick={() => setView(LANDING_PAGE_VIEW.LOGIN)}
             className="text-gray-700 font-semibold hover:text-orange-600 transition-colors"
           >
             Login
           </button>
           <button
-            onClick={() => setView("register")}
+            onClick={() => setView(LANDING_PAGE_VIEW.REGISTER)}
             className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-orange-200 transition-all active:scale-95"
           >
             Join Now
@@ -74,44 +81,57 @@ const LandingPage = () => {
         <div className="lg:w-1/2 flex justify-center lg:justify-start w-full h-full items-center overflow-hidden">
           <div className="w-full max-w-md bg-white/40 backdrop-blur-sm p-4 rounded-3xl max-h-[80vh] overflow-y-auto scrollbar-hide">
             <AnimatePresence mode="wait">
-              {view === "hero" && (
+              {/* HERO / HOME VIEW */}
+              {view === LANDING_PAGE_VIEW.HOME && (
                 <motion.div
-                  key="hero"
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -40 }}
-                  className="scrollbar-hide"
+                  key={LANDING_PAGE_VIEW.HOME}
+                  {...fadeAnimation}
                 >
-                  <HeroContent onAction={() => setView("register")} />
+                  <HeroContent onAction={() => setView(LANDING_PAGE_VIEW.REGISTER)} />
                 </motion.div>
               )}
 
-              {view === "register" && (
+              {/* REGISTER VIEW */}
+              {view === LANDING_PAGE_VIEW.REGISTER && (
                 <motion.div
-                  key="register"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="scrollbar-hide"
+                  key={LANDING_PAGE_VIEW.REGISTER}
+                  {...scaleAnimation}
                 >
                   <RegisterForm
-                    onSwitchToLogin={() => setView("login")}
-                    onBack={() => setView("hero")}
+                    onSwitchToLogin={() => setView(LANDING_PAGE_VIEW.LOGIN)}
+                    onBack={() => setView(LANDING_PAGE_VIEW.HOME)}
+                    onSuccess={handleRegistrationSuccess} 
                   />
                 </motion.div>
               )}
 
-              {view === "login" && (
+              {/* ACCOUNT VERIFY VIEW */}
+              {view === LANDING_PAGE_VIEW.ACC_VERIFY && (
                 <motion.div
-                  key="login"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="scrollbar-hide"
+                  key={LANDING_PAGE_VIEW.ACC_VERIFY}
+                  {...scaleAnimation}
+                >
+                  <AccountVerifyForm
+                    identifier={pendingIdentifier}
+                    onSuccess={() => setView(LANDING_PAGE_VIEW.LOGIN)}
+                    onBack={() => setView(LANDING_PAGE_VIEW.REGISTER)}
+                  />
+                </motion.div>
+              )}
+
+              {/* LOGIN VIEW */}
+              {view === LANDING_PAGE_VIEW.LOGIN && (
+                <motion.div 
+                  key={LANDING_PAGE_VIEW.LOGIN} 
+                  {...scaleAnimation}
                 >
                   <LoginForm
-                    onSwitchToRegister={() => setView("register")}
-                    onBack={() => setView("hero")}
+                    onSwitchToRegister={() => setView(LANDING_PAGE_VIEW.REGISTER)}
+                    onBack={() => setView(LANDING_PAGE_VIEW.HOME)}
+                    onUnverified={(identifier) => {
+                      setPendingIdentifier(identifier); 
+                      setView(LANDING_PAGE_VIEW.ACC_VERIFY); 
+                    }}
                   />
                 </motion.div>
               )}

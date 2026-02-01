@@ -23,6 +23,7 @@ public class ErrorMessageWarnConstant {
         INVALID_CREDENTIALS("Invalid username or password"),
         UNAUTHORIZED("User Not Authorized"),
         INTERNAL_SERVER_ERROR("An unexpected error occurred"),
+        ACCOUNT_NOT_VERIFIED("Account Not Verified"),
     	INVALID_EXPIRED_OTP("Invalid or expired OTP");
     	
         private final String message;

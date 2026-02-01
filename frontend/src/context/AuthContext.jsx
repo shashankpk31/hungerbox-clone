@@ -14,11 +14,24 @@ export const AuthProvider = ({ children }) => {
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem(LOCL_STRG_KEY.USER); // Use constant here
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsInitializing(false);
+    const initializeAuth = () => {
+      try {
+        const storedUser = localStorage.getItem(LOCL_STRG_KEY.USER);
+        const storedToken = localStorage.getItem(LOCL_STRG_KEY.TOKEN);
+
+        // Only set the user if both user data and token exist
+        if (storedUser && storedToken) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error("Failed to parse stored user:", error);
+        localStorage.clear(); // Clear corrupt data
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const saveLoginDetails = (userData, token) => {
@@ -28,11 +41,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem(LOCL_STRG_KEY.USER);
+    localStorage.removeItem(LOCL_STRG_KEY.TOKEN);
     setUser(null);
   };
 
-  // useMemo prevents components from re-rendering unless 'user' or 'isInitializing' actually changes
   const value = useMemo(
     () => ({
       user,
@@ -41,7 +54,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       isAuthenticated: !!user,
     }),
-    [user, isInitializing],
+    [user, isInitializing]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
