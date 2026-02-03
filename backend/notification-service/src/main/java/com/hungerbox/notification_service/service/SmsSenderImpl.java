@@ -1,6 +1,7 @@
 package com.hungerbox.notification_service.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
 import com.hungerbox.notification_service.constant.NotificationConstants;
@@ -13,6 +14,7 @@ import jakarta.annotation.PostConstruct;
 
 
 @Service
+@RefreshScope
 public class SmsSenderImpl implements MessageSender {
 
     @Value("${twilio.account-sid}")

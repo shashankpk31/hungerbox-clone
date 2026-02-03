@@ -8,50 +8,8 @@ spring:
   cloud:
     config:
       fail-fast: false
-  # Common Data/Messaging Settings
-  data:
-    redis:
-      host: redis
-      port: 6379
-  rabbitmq:
-    host: localhost
-    port: 5672
-  mail:
-    host: sandbox.smtp.mailtrap.io
-    port: 2525
-    username: ${MAILTRAP_USER}
-    password: ${MAILTRAP_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-server:
-  port: 8088
-
-# Common Third-Party Keys
-twilio:
-  account-sid: ${TWILIO_ACCOUNT_SID}
-  auth-token: ${TWILIO_AUTH_TOKEN}
-  phone-number: ${TWILIO_PHONE_NUMBER}
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-
----
-# Production Profile Overrides
-spring:
-  config:
-    activate:
-      on-profile: prod
-  rabbitmq:
-    host: ${RABBITMQ_HOST}
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://discovery-server:8761/eureka/
+      retry:
+        initial-interval: 1000
+        max-attempts: 6
+        max-interval: 2000
+        multiplier: 1.1

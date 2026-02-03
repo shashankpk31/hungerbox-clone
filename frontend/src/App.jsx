@@ -1,12 +1,13 @@
 import AppRoutes from "./routes/AppRoutes";
 import { AuthProvider } from "./context/AuthContext";
-import { Toaster } from "react-hot-toast"; 
+import { Toaster } from "react-hot-toast";
+import ReloadPrompt from "./components/ui/ReloadPrompt";
 
 function App() {
   return (
     <AuthProvider>
       <AppRoutes />
-      <Toaster 
+      <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
@@ -22,8 +23,9 @@ function App() {
               secondary: '#fff',
             },
           },
-        }} 
+        }}
       />
+      <ReloadPrompt />
     </AuthProvider>
   );
 }

@@ -1,0 +1,6 @@
+ <svg viewBox="0 0 100 100"  fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="45" fill="#ff5200" />
+    <path d="M50 20C35 20 25 35 25 50C25 65 35 80 50 80C65 80 75 65 75 50" stroke="white" strokeWidth="8" strokeLinecap="round" />
+    <circle cx="70" cy="40" r="12" fill="#f8fafc" /> {/* The "Bite" mark */}
+    <path d="M45 40L55 50L45 60" stroke="white" strokeWidth="8" strokeLinecap="round" strokeJoin="round" />
+</svg>

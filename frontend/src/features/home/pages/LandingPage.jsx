@@ -42,44 +42,45 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="h-screen w-full bg-gradient-to-br from-orange-50 via-white to-orange-50 overflow-hidden flex flex-col">
+    <div className="min-h-screen w-full bg-gradient-to-br from-orange-50 via-white to-orange-50 flex flex-col safe-area-insets">
       {/* Navbar */}
-      <nav className="flex justify-between items-center p-6 bg-transparent absolute w-full z-50">
+      <nav className="flex justify-between items-center p-4 sm:p-6 bg-transparent w-full z-50 flex-shrink-0">
         <motion.h1
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-2xl font-bold text-orange-600 cursor-pointer"
+          className="text-xl sm:text-2xl font-bold text-orange-600 cursor-pointer"
           onClick={() => setView(LANDING_PAGE_VIEW.HOME)}
         >
-          HungerBox
+          BiteDash
         </motion.h1>
 
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-3 sm:space-x-6">
           <button
             onClick={() => setView(LANDING_PAGE_VIEW.LOGIN)}
-            className="text-gray-700 font-semibold hover:text-orange-600 transition-colors"
+            className="text-gray-700 font-semibold hover:text-orange-600 transition-colors text-sm sm:text-base min-h-[44px] px-3 touch-manipulation"
           >
             Login
           </button>
           <button
             onClick={() => setView(LANDING_PAGE_VIEW.REGISTER)}
-            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2.5 rounded-full font-bold shadow-lg shadow-orange-200 transition-all active:scale-95"
+            className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 sm:px-6 sm:py-2.5 rounded-full font-bold shadow-lg shadow-orange-200 transition-all active:scale-95 text-sm sm:text-base min-h-[44px] touch-manipulation"
           >
-            Join Now
+            <span className="hidden sm:inline">Join Now</span>
+            <span className="sm:hidden">Join</span>
           </button>
         </div>
       </nav>
 
       {/* Main Container */}
-      <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between h-full pt-20 px-6 gap-12 overflow-hidden">
-        {/* Mockup Section */}
-        <div className="lg:w-1/2 flex justify-center items-center h-full max-h-[85vh]">
+      <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between flex-1 px-4 sm:px-6 py-4 sm:py-8 lg:py-0 gap-6 lg:gap-12 overflow-y-auto lg:overflow-hidden">
+        {/* Mockup Section - Hidden on mobile/tablet, shown on large screens */}
+        <div className="hidden lg:flex lg:w-1/2 justify-center items-center h-full">
           <PhoneMockup />
         </div>
 
         {/* Dynamic Form Section */}
-        <div className="lg:w-1/2 flex justify-center lg:justify-start w-full h-full items-center overflow-hidden">
-          <div className="w-full max-w-md bg-white/40 backdrop-blur-sm p-4 rounded-3xl max-h-[80vh] overflow-y-auto scrollbar-hide">
+        <div className="w-full lg:w-1/2 flex justify-center lg:justify-start">
+          <div className="w-full max-w-md bg-white/40 backdrop-blur-sm p-4 sm:p-6 rounded-2xl sm:rounded-3xl">
             <AnimatePresence mode="wait">
               {/* HERO / HOME VIEW */}
               {view === LANDING_PAGE_VIEW.HOME && (
@@ -100,7 +101,7 @@ const LandingPage = () => {
                   <RegisterForm
                     onSwitchToLogin={() => setView(LANDING_PAGE_VIEW.LOGIN)}
                     onBack={() => setView(LANDING_PAGE_VIEW.HOME)}
-                    onSuccess={handleRegistrationSuccess} 
+                    onSuccess={handleRegistrationSuccess}
                   />
                 </motion.div>
               )}
@@ -121,16 +122,16 @@ const LandingPage = () => {
 
               {/* LOGIN VIEW */}
               {view === LANDING_PAGE_VIEW.LOGIN && (
-                <motion.div 
-                  key={LANDING_PAGE_VIEW.LOGIN} 
+                <motion.div
+                  key={LANDING_PAGE_VIEW.LOGIN}
                   {...scaleAnimation}
                 >
                   <LoginForm
                     onSwitchToRegister={() => setView(LANDING_PAGE_VIEW.REGISTER)}
                     onBack={() => setView(LANDING_PAGE_VIEW.HOME)}
                     onUnverified={(identifier) => {
-                      setPendingIdentifier(identifier); 
-                      setView(LANDING_PAGE_VIEW.ACC_VERIFY); 
+                      setPendingIdentifier(identifier);
+                      setView(LANDING_PAGE_VIEW.ACC_VERIFY);
                     }}
                   />
                 </motion.div>

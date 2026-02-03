@@ -1,0 +1,40 @@
+# Payment Service - Production Profile
+server:
+  port: 8087
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/hungerbox_payment
+    username: hbadmin
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+# Razorpay Configuration
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID}
+  key-secret: ${RAZORPAY_KEY_SECRET}
+  webhook-secret: ${RAZORPAY_WEBHOOK_SECRET}
+
+# Feign Client Configuration
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
+# Eureka Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/

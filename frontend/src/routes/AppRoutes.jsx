@@ -57,7 +57,7 @@ const AppRoutes = () => {
           element={
             <DashboardLayout
               navigationLinks={superAdminNav}
-              brandName="HB | Super"
+              brandName="BiteDash Super"
             />
           }
         >
@@ -77,7 +77,7 @@ const AppRoutes = () => {
           element={
             <DashboardLayout
               navigationLinks={orgAdminNav}
-              brandName="HB | Org"
+              brandName="BiteDash Org"
             />
           }
         >

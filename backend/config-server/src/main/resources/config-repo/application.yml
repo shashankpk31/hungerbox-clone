@@ -1,0 +1,44 @@
+# Common Configuration for All Services
+# This file contains shared configuration that applies to all microservices
+
+# Common Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,env,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    refresh:
+      enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+# Common JPA Configuration
+spring:
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+    open-in-view: false
+
+# Common Eureka Configuration (Development)
+eureka:
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 30
+    healthcheck:
+      enabled: true
